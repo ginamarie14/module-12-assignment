@@ -1,11 +1,5 @@
-const express = require('express');
 const mysql = require('mysql2');
-
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+const inquirer = require('inquirer');
 
 const db = mysql.createConnection(
   {
@@ -19,20 +13,67 @@ const db = mysql.createConnection(
   console.log(`Connected to the employeetracker_db database.`)
 );
 
-// Query database using COUNT() and GROUP BY
-db.query('SELECT COUNT(id) AS total_count FROM favorite_books GROUP BY in_stock', function (err, results) {
-  console.log(results);
-});
+function seeDepartments() {
+  db.query (`SELECT * FROM departments`)
+  console.log("we have departments")
+}
 
-// Query database using SUM(), MAX(), MIN() AVG() and GROUP BY
-db.query('SELECT SUM(quantity) AS total_in_section, MAX(quantity) AS max_quantity, MIN(quantity) AS min_quantity, AVG(quantity) AS avg_quantity FROM favorite_books GROUP BY section', function (err, results) {
-  console.log(results);
-});
+function seeRoles() {
+  db.query (`SELECT * FROM roles`)
+  console.log("we have roles")
+}
 
-app.use((req, res) => {
-  res.status(404).end();
-});
+function seeEmployees() {
+  db.query (`SELECT * FROM employees`)
+  console.log("we have employees")
+}
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+function addDepartment(){
+
+}
+
+function addEmployee(){
+  
+}
+
+function addRole(){
+  
+}
+
+function checkInfo(){
+  inquirer.prompt({
+    name: 'info',
+    type: 'list',
+    message: 'What would you like to check?',
+    choices: [
+      'See departments',
+      'See employees',
+      'See roles',
+      'Add department',
+      'Add employee',
+      'Add role',
+      'All done!'
+    ]
+  })
+  .then (
+    function(pick){
+      if (pick.info === 'See departments'){
+        seeDepartments();
+      }else if (pick.info === 'See employees'){
+        seeEmployees();
+      }else if (pick.info === 'See roles'){
+        seeRoles();
+      }else if (pick.info === 'Add department'){
+
+      }else if (pick.info === 'Add employee'){
+
+      }else if (pick.info === 'Add role'){
+
+      }else if (pick.info === 'All done!'){
+
+      }
+    
+    }
+  )
+
+}
