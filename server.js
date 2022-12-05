@@ -1,5 +1,7 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
+const { createPublicKey } = require('crypto');
+const { exit } = require('process');
 
 const db = mysql.createConnection(
   {
@@ -12,33 +14,6 @@ const db = mysql.createConnection(
   },
   console.log(`Connected to the employeetracker_db database.`)
 );
-
-function seeDepartments() {
-  db.query (`SELECT * FROM departments`)
-  console.log("we have departments")
-}
-
-function seeRoles() {
-  db.query (`SELECT * FROM roles`)
-  console.log("we have roles")
-}
-
-function seeEmployees() {
-  db.query (`SELECT * FROM employees`)
-  console.log("we have employees")
-}
-
-function addDepartment(){
-
-}
-
-function addEmployee(){
-  
-}
-
-function addRole(){
-  
-}
 
 function checkInfo(){
   inquirer.prompt({
@@ -59,21 +34,115 @@ function checkInfo(){
     function(pick){
       if (pick.info === 'See departments'){
         seeDepartments();
-      }else if (pick.info === 'See employees'){
+      } else if (pick.info === 'See employees'){
         seeEmployees();
-      }else if (pick.info === 'See roles'){
+      } else if (pick.info === 'See roles'){
         seeRoles();
-      }else if (pick.info === 'Add department'){
-
-      }else if (pick.info === 'Add employee'){
-
-      }else if (pick.info === 'Add role'){
-
-      }else if (pick.info === 'All done!'){
-
+      } else if (pick.info === 'Add department'){
+        addDepartment();
+      } else if (pick.info === 'Add employee'){
+        addEmployee();
+      } else if (pick.info === 'Add role'){
+        addRole();
+      } else if (pick.info === 'All done!'){
+        exit
       }
     
-    }
+    },
   )
 
-}
+};
+
+
+function seeDepartments() {
+  db.query((`SELECT * FROM departments`),(err,deps)=>{
+    if (err){
+      console.log(err)
+    } console.table(deps)
+  })
+  console.log('Press any key to return to main menu');
+  process.stdin.once('data', function () {
+    checkInfo();
+  });
+};
+
+function seeRoles() {
+  db.query((`SELECT * FROM roles`),(err,rol)=>{
+    if (err){
+      console.log(err)
+    } console.table(rol)
+  })
+};
+
+function seeEmployees() {
+  db.query((`SELECT * FROM employees`),(err,emp)=>{
+    if (err){
+      console.log(err)
+    } console.table(emp)
+  })
+  //click to pop out
+};
+
+function addDepartment(){
+  inquirer.prompt({
+    name: 'department_name',
+    type: 'input',
+    message: 'What department would you like to add?'
+  })
+  .then(
+    function(depname){
+      const sql = `INSERT INTO employees (first_name, last_name) VALUES (?)`;
+      const params = depname.department_name;
+      db.query(sql, params, (err,depadd)=>{
+        if (err){
+          console.log(err)
+        } console.log("New department successfully added!")
+        return depadd;
+      });
+      checkInfo();
+    })
+};
+
+function addEmployee(){
+  inquirer.prompt({
+    name: 'employee_name',
+    type: 'input',
+    message: 'Which employee would you like to add?'
+  })
+  .then(
+    function(empname){
+      const sql = `INSERT INTO departments (department_name) VALUES (?)`;
+      const params = empname.employee_name;
+      //console.log(params);
+      db.query(sql, params, (err,empadd)=>{
+        if (err){
+          console.log(err)
+        } console.log("New employee successfully added!")
+        return empadd;
+      });
+      checkInfo();
+    })
+};
+
+function addRole(){
+  inquirer.prompt({
+    name: 'role_name',
+    type: 'input',
+    message: 'what role would you like to add?'
+  })
+  .then(
+    function(rolname){
+      const sql = `INSERT INTO roles (role_name) VALUES (?)`;
+      const params = rolname.role_name;
+      db.query(sql, params, (err,roladd)=>{
+        if (err){
+          console.log(err)
+        } console.log("New role successfully added!")
+        return roladd;
+      });
+      checkInfo();
+    })
+};
+
+
+checkInfo();
