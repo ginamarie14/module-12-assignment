@@ -60,10 +60,12 @@ function seeDepartments() {
       console.log(err)
     } console.table(deps)
   })
-  console.log('Press any key to return to main menu');
-  process.stdin.once('data', function () {
-    checkInfo();
-  });
+  backToMenu()
+  
+  // console.log('Press any key to return to main menu');
+  // process.stdin.once('data', function () {
+  //   checkInfo();
+  // });
 };
 
 function seeRoles() {
@@ -144,5 +146,21 @@ function addRole(){
     })
 };
 
+function backToMenu(){
+  setTimeout(() => {
+    // inquirer prompt goes here
+    inquirer.prompt({
+      name: 'continue',
+      message: 'Press enter to return to the main menu',
+    })
+    .then (
+      function(){
+        if (event.keyCode === 13){
+          checkInfo();
+        } 
+      },
+    )
+  }, "3000")
+}
 
 checkInfo();
