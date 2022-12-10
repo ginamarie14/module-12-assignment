@@ -154,7 +154,7 @@ function backToMenu(){
       message: 'Press enter to return to the main menu',
     })
     .then (
-      function(){
+      function(event){
         if (event.keyCode === 13){
           checkInfo();
         } 
