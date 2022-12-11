@@ -44,6 +44,8 @@ function checkInfo(){
         addEmployee();
       } else if (pick.info === 'Add role'){
         addRole();
+      } else if (pick.info === 'Update an employee\'s role'){
+        updateEmployeeRole();
       } else if (pick.info === 'All done!'){
         exit
       }
@@ -94,7 +96,7 @@ function addDepartment(){
   })
   .then(
     function(depname){
-      const sql = `INSERT INTO employees (first_name, last_name) VALUES (?)`;
+      const sql = `INSERT INTO departments (department_name) VALUES (?)`;
       const params = depname.department_name;
       db.query(sql, params, (err,depadd)=>{
         if (err){
@@ -114,7 +116,7 @@ function addEmployee(){
   })
   .then(
     function(empname){
-      const sql = `INSERT INTO departments (department_name) VALUES (?)`;
+      const sql = `INSERT INTO employees (first_name, last_name) VALUES (?)`;
       const params = empname.employee_name;
       //console.log(params);
       db.query(sql, params, (err,empadd)=>{
@@ -128,6 +130,26 @@ function addEmployee(){
 };
 
 function addRole(){
+  inquirer.prompt({
+    name: 'role_name',
+    type: 'input',
+    message: 'what role would you like to add?'
+  })
+  .then(
+    function(rolname){
+      const sql = `INSERT INTO roles (role_name) VALUES (?)`;
+      const params = rolname.role_name;
+      db.query(sql, params, (err,roladd)=>{
+        if (err){
+          console.log(err)
+        } console.log("New role successfully added!")
+        return roladd;
+      });
+      backToMenu();
+    })
+};
+
+function updateEmployeeRole(){
   inquirer.prompt({
     name: 'role_name',
     type: 'input',
