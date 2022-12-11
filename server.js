@@ -102,7 +102,7 @@ function addDepartment(){
         } console.log("New department successfully added!")
         return depadd;
       });
-      checkInfo();
+      backToMenu();
     })
 };
 
@@ -123,7 +123,7 @@ function addEmployee(){
         } console.log("New employee successfully added!")
         return empadd;
       });
-      checkInfo();
+      backToMenu();
     })
 };
 
@@ -143,7 +143,7 @@ function addRole(){
         } console.log("New role successfully added!")
         return roladd;
       });
-      checkInfo();
+      backToMenu();
     })
 };
 
@@ -156,9 +156,9 @@ function backToMenu(){
     })
     .then (
       function(event){
-        if (event.keyCode === 13){
+        if (event.continue == ''){
           checkInfo();
-        } 
+        }
       },
     )
   }, "3000")
