@@ -63,11 +63,6 @@ function seeDepartments() {
     } console.table(deps)
   })
   backToMenu();
-  
-  // console.log('Press any key to return to main menu');
-  // process.stdin.once('data', function () {
-  //   checkInfo();
-  // });
 };
 
 function seeRoles() {
@@ -109,16 +104,43 @@ function addDepartment(){
 };
 
 function addEmployee(){
+  const sql = 'SELECT * FROM roles';
+  db.query(sql, (currentRoles) => {
+    currentRoles = currentRoles.map((role) => {
+      return {
+        name: role.title,
+        value: role.id,
+      };
+    });
+  console.log('Let\'s add an employee!');
   inquirer.prompt({
-    name: 'employee_name',
+    name: 'employee_firstname',
     type: 'input',
-    message: 'Which employee would you like to add?'
-  })
+    message: 'What is the employee\'s first name?'
+  },
+  {
+    name: 'employee_lastname',
+    type: 'input',
+    message: 'What is the employee\'s last name?'
+  },
+  {
+    name: 'role_id',
+    type: 'list',
+    message: 'What will their role be?',
+    options: currentRoles
+  },
+  {
+    name: 'manager_id',
+    type: 'list',
+    message: 'select a manager id...',
+    choices: [1],
+  }
+  )
   .then(
-    function(empname){
-      const sql = `INSERT INTO employees (first_name, last_name) VALUES (?)`;
-      const params = empname.employee_name;
-      //console.log(params);
+    function(newemp){
+      const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?)`;
+      const params = [newemp.employee_firstname, newemp.employee_lastname, newemp];
+      console.log(params);
       db.query(sql, params, (err,empadd)=>{
         if (err){
           console.log(err)
@@ -127,18 +149,39 @@ function addEmployee(){
       });
       backToMenu();
     })
-};
+})};
 
 function addRole(){
-  inquirer.prompt({
-    name: 'role_name',
+  const sql = `SELECT * FROM departments`;
+  db.query(sql, (currentDepartments) => {
+    currentDepartments = currentDepartments.map((departments) => {
+      return {
+        name: departments.department_name,
+        value: departments.id,
+      };
+    });
+  inquirer.prompt([
+    {
+    name: 'title',
     type: 'input',
-    message: 'what role would you like to add?'
-  })
+    message: 'What role would you like to add?'
+    },
+    {
+      name: 'salary',
+      type: 'input',
+      message: 'What is this role\'s salary?',
+    },
+    {
+      name: 'department_id',
+          type: 'list',
+          message: 'What department would this role fit into?',
+          choices: currentDepartments,
+    }
+  ])
   .then(
     function(rolname){
-      const sql = `INSERT INTO roles (role_name) VALUES (?)`;
-      const params = rolname.role_name;
+      const sql = `INSERT INTO roles (role_title, role_salary, role_department_id) VALUES (?)`;
+      const params = rolname.role_title;
       db.query(sql, params, (err,roladd)=>{
         if (err){
           console.log(err)
@@ -147,9 +190,24 @@ function addRole(){
       });
       backToMenu();
     })
+  })
 };
 
 function updateEmployeeRole(){
+  db.query('SELECT * FROM employees', (currentEmployees) => {
+    currentEmployees = currentEmployees.map((employees) => {
+      return {
+        name: `${employees.first_name} ${employees.last_name}`,
+        value: employees.id,
+      };
+    });
+  db.query('SELECT * FROM roles', (currentRoles) => {
+    currentRoles = currentRoles.map((role) => {
+      return {
+        name: role.title,
+        value: role.id,
+      };
+    });
   inquirer.prompt({
     name: 'role_name',
     type: 'input',
@@ -166,7 +224,9 @@ function updateEmployeeRole(){
         return roladd;
       });
       backToMenu();
+      })
     })
+  })
 };
 
 function backToMenu(){
