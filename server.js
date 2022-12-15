@@ -105,7 +105,10 @@ function addDepartment(){
 
 function addEmployee(){
   const sql = 'SELECT * FROM roles';
-  db.query(sql, (currentRoles) => {
+  db.query(sql, (err, currentRoles) => {
+    if (err) {
+      console.log(err);
+    }
     currentRoles = currentRoles.map((role) => {
       return {
         name: role.title,
@@ -113,7 +116,8 @@ function addEmployee(){
       };
     });
   console.log('Let\'s add an employee!');
-  inquirer.prompt({
+  inquirer.prompt([
+  {
     name: 'employee_firstname',
     type: 'input',
     message: 'What is the employee\'s first name?'
@@ -127,20 +131,19 @@ function addEmployee(){
     name: 'role_id',
     type: 'list',
     message: 'What will their role be?',
-    options: currentRoles
+    choices: currentRoles
   },
   {
     name: 'manager_id',
     type: 'list',
-    message: 'select a manager id...',
+    message: 'Insert a manager ID:',
     choices: [1],
   }
-  )
+])
   .then(
     function(newemp){
-      const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?)`;
-      const params = [newemp.employee_firstname, newemp.employee_lastname, newemp];
-      console.log(params);
+      const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
+      const params = [newemp.employee_firstname, newemp.employee_lastname, newemp.role_id, newemp.manager_id];
       db.query(sql, params, (err,empadd)=>{
         if (err){
           console.log(err)
@@ -152,14 +155,18 @@ function addEmployee(){
 })};
 
 function addRole(){
-  const sql = `SELECT * FROM departments`;
-  db.query(sql, (currentDepartments) => {
-    currentDepartments = currentDepartments.map((departments) => {
+  const sql = 'SELECT * FROM departments';
+  db.query(sql, (err, currentDepartments) => {
+    if (err) {
+      console.log(err);
+    }
+    currentDepartments = currentDepartments.map((department) => {
       return {
-        name: departments.department_name,
-        value: departments.id,
+        name: department.department_name,
+        value: department.id,
       };
     });
+  console.log('Let\'s add a role!');
   inquirer.prompt([
     {
     name: 'title',
@@ -180,12 +187,13 @@ function addRole(){
   ])
   .then(
     function(rolname){
-      const sql = `INSERT INTO roles (role_title, role_salary, role_department_id) VALUES (?)`;
-      const params = rolname.role_title;
+      const sql = 'INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)';
+      const params = [rolname.title, rolname.salary, rolname.department_id];
       db.query(sql, params, (err,roladd)=>{
         if (err){
           console.log(err)
-        } console.log("New role successfully added!")
+        } 
+        console.log("New role successfully added!")
         return roladd;
       });
       backToMenu();
@@ -194,14 +202,20 @@ function addRole(){
 };
 
 function updateEmployeeRole(){
-  db.query('SELECT * FROM employees', (currentEmployees) => {
+  db.query('SELECT * FROM employees', (err, currentEmployees) => {
+    if (err) {
+      console.log(err);
+    }
     currentEmployees = currentEmployees.map((employees) => {
       return {
         name: `${employees.first_name} ${employees.last_name}`,
         value: employees.id,
       };
     });
-  db.query('SELECT * FROM roles', (currentRoles) => {
+  db.query('SELECT * FROM roles', (err, currentRoles) => {
+    if (err) {
+      console.log(err);
+    }
     currentRoles = currentRoles.map((role) => {
       return {
         name: role.title,
@@ -209,20 +223,34 @@ function updateEmployeeRole(){
       };
     });
   inquirer.prompt({
-    name: 'role_name',
-    type: 'input',
-    message: 'what role would you like to add?'
+    name: 'id',
+    type: 'list',
+    message: 'Who are we updating?',
+    choices: currentEmployees
+  },
+  {
+      name: 'update',
+      type: 'list',
+      message: 'What are we updating?',
+      choices: ['Employee\'s role', 'Employee\'s manager']
   })
-  .then(
-    function(rolname){
-      const sql = `INSERT INTO roles (role_name) VALUES (?)`;
-      const params = rolname.role_name;
-      db.query(sql, params, (err,roladd)=>{
-        if (err){
-          console.log(err)
-        } console.log("New role successfully added!")
-        return roladd;
-      });
+  .then((data) => {
+    db.query(
+      'UPDATE employee SET ? WHERE ?',
+      [
+        {
+          role_id: data.title,
+        },
+        {
+          id: data.id,
+        },
+      ],
+      function (err) {
+        if (err) {
+          console.log('Role could not be updated');
+          console.log(err);
+        }
+    });
       backToMenu();
       })
     })
