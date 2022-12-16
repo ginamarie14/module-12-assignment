@@ -214,7 +214,6 @@ function updateEmployeeRole(){
         value: employees.id
       }
     })
-  });
   db.query('SELECT * FROM roles', (err, currentRoles) => {
     if (err) {
       console.log(err);
@@ -225,7 +224,6 @@ function updateEmployeeRole(){
         value: role.id,
       }
     })
-  });
   inquirer.prompt([
     {
     name: 'id',
@@ -241,7 +239,7 @@ function updateEmployeeRole(){
     }
   ])
   .then((newInfo) => {
-    db.query('UPDATE employee SET ? WHERE ?', [{role_id: newInfo.title}, {id: newInfo.id}],
+    db.query('UPDATE employees SET ? WHERE ?', [{role_id: newInfo.title}, {id: newInfo.id}],
       function (err) {
         if (err) {
           console.log('Failed to update employee\'s role.');
@@ -249,6 +247,8 @@ function updateEmployeeRole(){
         }
       });
     })
+  })
+})
   console.log('Employee role successfully updated!')
   backToMenu();
 };
