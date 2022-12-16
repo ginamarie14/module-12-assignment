@@ -203,6 +203,7 @@ function addRole(){
 };
 
 function updateEmployeeRole(){
+
   db.query('SELECT * FROM employees', (err, currentEmployees) =>{
     if (err) {
       console.log(err);
@@ -233,22 +234,23 @@ function updateEmployeeRole(){
     choices: currentEmployees
     },
     {
-      name: 'update',
+      name: 'title',
       type: 'list',
-      message: 'What are we updating?',
-      choices: ['Employee\'s role', 'Employee\'s manager']
+      message: 'What is their new role?',
+      choices: currentRoles
     }
   ])
   .then((newInfo) => {
     db.query('UPDATE employee SET ? WHERE ?', [{role_id: newInfo.title}, {id: newInfo.id}],
       function (err) {
         if (err) {
-          console.log('Failed to update.');
+          console.log('Failed to update employee\'s role.');
           console.log(err);
         }
       });
-      backToMenu();
     })
+  console.log('Employee role successfully updated!')
+  backToMenu();
 };
 
 function backToMenu(){
