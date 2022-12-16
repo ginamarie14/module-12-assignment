@@ -4,7 +4,7 @@
 
 This command-line application is a **content management system (CMS)**. Built with Node.js, Inquirer, and MySQL, this CMS allows the user to look up and add departments, employees, and roles within the company. The user can also update different employees' roles.
 
-Here is a video of how this app works:
+Here is a video of how this app works: https://drive.google.com/file/d/1zQjakphqMt4QFkvwyE35JFUDDLTEHV6-/view
 
 ## Mock-Up
 
