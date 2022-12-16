@@ -27,6 +27,7 @@ function checkInfo(){
       'Add department',
       'Add employee',
       'Add role',
+      'Update an employee\'s role',
       'All done!'
     ]
   })
@@ -202,16 +203,17 @@ function addRole(){
 };
 
 function updateEmployeeRole(){
-  db.query('SELECT * FROM employees', (err, currentEmployees) => {
+  db.query('SELECT * FROM employees', (err, currentEmployees) =>{
     if (err) {
       console.log(err);
     }
     currentEmployees = currentEmployees.map((employees) => {
       return {
         name: `${employees.first_name} ${employees.last_name}`,
-        value: employees.id,
-      };
-    });
+        value: employees.id
+      }
+    })
+  });
   db.query('SELECT * FROM roles', (err, currentRoles) => {
     if (err) {
       console.log(err);
@@ -220,41 +222,33 @@ function updateEmployeeRole(){
       return {
         name: role.title,
         value: role.id,
-      };
-    });
-  inquirer.prompt({
+      }
+    })
+  });
+  inquirer.prompt([
+    {
     name: 'id',
     type: 'list',
     message: 'Who are we updating?',
     choices: currentEmployees
-  },
-  {
+    },
+    {
       name: 'update',
       type: 'list',
       message: 'What are we updating?',
       choices: ['Employee\'s role', 'Employee\'s manager']
-  })
-  .then((data) => {
-    db.query(
-      'UPDATE employee SET ? WHERE ?',
-      [
-        {
-          role_id: data.title,
-        },
-        {
-          id: data.id,
-        },
-      ],
+    }
+  ])
+  .then((newInfo) => {
+    db.query('UPDATE employee SET ? WHERE ?', [{role_id: newInfo.title}, {id: newInfo.id}],
       function (err) {
         if (err) {
-          console.log('Role could not be updated');
+          console.log('Failed to update.');
           console.log(err);
         }
-    });
+      });
       backToMenu();
-      })
     })
-  })
 };
 
 function backToMenu(){
